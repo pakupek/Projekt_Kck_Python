@@ -8,11 +8,13 @@ from OmdbService import OmdbService
 from TmdbService import TmdbService
 from MovieController import MovieController
 from textual import on
+from MovieView import MovieView
 
 class TextualView(App):
     def __init__(self, controller):
         super().__init__()
-        self.controller = controller  # Przechowuj instancję MovieController
+        self.controller = controller
+        self.selected_choice = None  # Przechowuj instancję MovieController
 
     async def on_mount(self):
         await self.display_main_menu()  # Wyświetl główne menu po zamontowaniu
@@ -38,27 +40,58 @@ class TextualView(App):
         await menu_container.mount(tmdb_button)
         await menu_container.mount(exit_button)
 
+    async def display_sub_menu(self, title):
+        sub_menu_container = Vertical(id="sub_menu_container")
+        await self.mount(sub_menu_container)
+
+        # Dodaj nagłówek
+        header = Static(title)
+        await sub_menu_container.mount(header)
+
+        # Przyciski opcji menu
+        option1 = Button("1. Search Movie", id="option_1")
+        option2 = Button("2. Display Favorites", id="option_2")
+        option3 = Button("3. Add to Favorites", id="option_3")
+        exit_button = Button("4. Exit", id="exit_button")
+
+        # Zamontuj przyciski
+        await sub_menu_container.mount(option1, option2, option3, exit_button)
+
+
     # Dekoratory dla zdarzeń naciśnięcia przycisków
     @on(Button.Pressed, "#omdb_button")
-    async def handle_omdb_click(self, event: Event):
+    async def handle_omdb_click(self):
         await self.controller.omdb_menu()  # Wywołaj metodę omdb_menu z kontrolera
+        await self.display_message("Wybrano OMDb.")  # Wyświetl informację o wyborze
 
     @on(Button.Pressed, "#tmdb_button")
-    async def handle_tmdb_click(self, event: Event):
+    async def handle_tmdb_click(self):
         await self.controller.tmdb_menu()  # Wywołaj metodę tmdb_menu z kontrolera
+        await self.display_message("Wybrano TMDb.")  # Wyświetl informację o wyborze
 
     @on(Button.Pressed, "#exit_button")
-    async def handle_exit_click(self, event: Event):
+    async def handle_exit_click(self):
         await self.shutdown()  # Zakończ działanie aplikacji
+
+    
 
 
 # Przykład użycia
 if __name__ == "__main__":
-    # Załóżmy, że masz instancje usług OMDb i TMDb oraz stworzoną instancję MovieController
-    omdb_service = OmdbService
-    tmdb_service = TmdbService
-    controller = MovieController(view=None, omdb_service=omdb_service, tmdb_service=tmdb_service)
-
-    # Tworzymy instancję MovieView z kontrolerem
+    # Krok 1: Tworzenie instancji usług
+    omdb_service = OmdbService()
+    tmdb_service = TmdbService()
+    view = MovieView()
+    # Krok 2: Najpierw twórz instancję kontrolera z None jako widok
+    controller = MovieController(view=view, omdb_service=omdb_service, tmdb_service=tmdb_service)
+    
+    # Krok 3: Następnie twórz instancję widoku i przekaż kontroler
     app = TextualView(controller=controller)
+    
+    # Krok 4: Ustaw widok w kontrolerze
+    controller.view = app  # Ustaw widok w kontrolerze
+
+    # Krok 5: Uruchom aplikację
+    app.run()
+    
     
