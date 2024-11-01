@@ -62,12 +62,12 @@ class TextualView(App):
     @on(Button.Pressed, "#omdb_button")
     async def handle_omdb_click(self):
         await self.controller.omdb_menu()  # Wywołaj metodę omdb_menu z kontrolera
-        await self.display_message("Wybrano OMDb.")  # Wyświetl informację o wyborze
+        
 
     @on(Button.Pressed, "#tmdb_button")
     async def handle_tmdb_click(self):
         await self.controller.tmdb_menu()  # Wywołaj metodę tmdb_menu z kontrolera
-        await self.display_message("Wybrano TMDb.")  # Wyświetl informację o wyborze
+        
 
     @on(Button.Pressed, "#exit_button")
     async def handle_exit_click(self):
@@ -78,18 +78,13 @@ class TextualView(App):
 
 # Przykład użycia
 if __name__ == "__main__":
-    # Krok 1: Tworzenie instancji usług
     omdb_service = OmdbService()
     tmdb_service = TmdbService()
-    view = MovieView()
-    # Krok 2: Najpierw twórz instancję kontrolera z None jako widok
-    controller = MovieController(view=view, omdb_service=omdb_service, tmdb_service=tmdb_service)
-    
-    # Krok 3: Następnie twórz instancję widoku i przekaż kontroler
-    app = TextualView(controller=controller)
-    
-    # Krok 4: Ustaw widok w kontrolerze
-    controller.view = app  # Ustaw widok w kontrolerze
+    controller = MovieController(view=None, omdb_service=omdb_service, tmdb_service=tmdb_service)  # Twórz kontroler bez widoku
+
+    app = TextualView(controller=controller)  # Przekazuj kontroler do widoku
+    controller.view = app  # Przypisz widok do kontrolera
+
 
     # Krok 5: Uruchom aplikację
     app.run()
