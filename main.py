@@ -1,6 +1,6 @@
-from MovieView import MovieView
 from MovieController import MovieController
-from TmdbService import TmdbService  # Zakładam, że masz tę klasę zdefiniowaną
+from MovieView import MovieView
+from TmdbService import TmdbService
 from OmdbService import OmdbService
 
 def main():
@@ -10,7 +10,5 @@ def main():
 
     controller = MovieController(omdb_service, tmdb_service, view)
     controller.run()
-
-
 if __name__ == "__main__":
     main()
